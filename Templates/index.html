@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <title>NZ Wildlife</title>
+    <script>
+        function filterByField() {
+            const fieldSelect = document.getElementById("species_id");
+            const selectedField = fieldSelect.value;
+            
+            // Redirect to the same page with the selected field as a parameter
+            window.location.href = `/?field=${encodeURIComponent(selectedField)}`;
+        }
+    </script>
+</head>
+<body>
+    <h1>The NZ Wildlife Program</h1>
+    
+    <!-- Search form -->
+    <form action="/species" method="get">
+        <div class="search-container">
+            <input type="text" id="search-box" name="name" class="search-input" placeholder="Search...">
+            <button type="submit">Search</button>
+        </div>
+        <br>
+        <input type="hidden" name="field" value="species_name">
+    </form>
+    
+    <!-- Field selector form -->
+    <div class="field-selector">
+        <label for="species_id">Select a field to display:</label>
+        <select name="field" id="species_id" onchange="filterByField()">
+            <option value="">All Fields</option>
+            <option value="species_name" {% if selected_field == 'species_name' %}selected{% endif %}>Species Name</option>
+            <option value="scientific_name" {% if selected_field == 'scientific_name' %}selected{% endif %}>Scientific Name</option>
+            <option value="species_type" {% if selected_field == 'species_type' %}selected{% endif %}>Species Type</option>
+            <option value="origin_status" {% if selected_field == 'origin_status' %}selected{% endif %}>Origin Status</option>
+            <option value="predator" {% if selected_field == 'predator' %}selected{% endif %}>Predator</option>
+            <option value="prey" {% if selected_field == 'prey' %}selected{% endif %}>Prey</option>
+            <option value="status" {% if selected_field == 'status' %}selected{% endif %}>Status</option>
+            <option value="family" {% if selected_field == 'family' %}selected{% endif %}>Family</option>
+            <option value="numbers" {% if selected_field == 'numbers' %}selected{% endif %}>Numbers</option>
+        </select>
+    </div>
+
+    <h2>{% if selected_field %}{{ selected_field|replace('_', ' ')|title }} Data{% else %}All Species Data{% endif %}</h2>
+    
+    {% if selected_field %}
+        <!-- Display only the selected field -->
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>{{ selected_field|replace('_', ' ')|title }}</th>
+                <th>Image</th>
+            </tr>
+            {% for item in species %}
+            <tr>
+                <td>{{ item[0] }}</td>
+                <td>{{ item[field_indices[selected_field]] }}</td>
+                <td><img width="150px" src="{{ item[10] }}" alt="{{ item[1] }} image"></td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <!-- Display all fields -->
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Species Name</th>
+                <th>Scientific Name</th>
+                <th>Species Type</th>
+                <th>Origin Status</th>
+                <th>Predator</th>
+                <th>Prey</th>
+                <th>Status</th>
+                <th>Family</th>
+                <th>Numbers</th>
+                <th>Image</th>
+            </tr>
+            {% for item in species %}
+            <tr>
+                <td>{{ item[0] }}</td>
+                <td>{{ item[1] }}</td>
+                <td>{{ item[2] }}</td>
+                <td>{{ item[3] }}</td>
+                <td>{{ item[4] }}</td>
+                <td>{{ item[5] }}</td>
+                <td>{{ item[6] }}</td>
+                <td>{{ item[7] }}</td>
+                <td>{{ item[8] }}</td>
+                <td>{{ item[9] }}</td>
+                <td><img width="150px" src="{{ item[10] }}" alt="{{ item[1] }} image"></td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <h2>Origin Status</h2>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Origin Status</th>
+        </tr>
+        {% for item in origin_status %}
+        <tr>
+            <td>{{ item[0] }}</td>
+            <td>{{ item[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Species Type</h2>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Species Type</th>
+        </tr>
+        {% for item in species_type %}
+        <tr>
+            <td>{{ item[0] }}</td>
+            <td>{{ item[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Status</h2>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Status</th>
+        </tr>
+        {% for item in status %}
+        <tr>
+            <td>{{ item[0] }}</td>
+            <td>{{ item[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

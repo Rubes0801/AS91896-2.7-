@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <title>Search Results - NZ Wildlife</title>
+</head>
+<body>
+    <h1>Search Results</h1>
+    <a href="/" class="back-link">← Back to Home</a>
+
+    {% if search_query %}
+        <h2>Results for: "{{ search_query }}"</h2>
+        {% if species %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Species Name</th>
+                        <th>Matched Field</th>
+                        <th>Field Value</th>
+                        <th>Image</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in species %}
+                    <tr class="species-row" data-name="{{ item[1] }}">
+                        <td>{{ item[1] }}</td>
+                        <td>{{ item[11] }}</td>
+                        <td>
+                            {% if item[11] == 'Species Name' %}{{ item[1] }}
+                            {% elif item[11] == 'Scientific Name' %}{{ item[2] }}
+                            {% elif item[11] == 'Species Type' %}{{ item[3] }}
+                            {% elif item[11] == 'Origin Status' %}{{ item[4] }}
+                            {% elif item[11] == 'Predator' %}{{ item[5] }}
+                            {% elif item[11] == 'Prey' %}{{ item[6] }}
+                            {% elif item[11] == 'Status' %}{{ item[7] }}
+                            {% elif item[11] == 'Family' %}{{ item[8] }}
+                            {% elif item[11] == 'Numbers' %}{{ item[9] }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item[10] %}
+                                <img src="{{ item[10] }}" alt="{{ item[1] }}" width="150">
+                            {% else %}
+                                No image available
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p id="no-results">No results found for "{{ search_query }}"</p>
+        {% endif %}
+    {% else %}
+        <p>Please enter a search term to find species.</p>
+    {% endif %}
+</body>
+</html>
