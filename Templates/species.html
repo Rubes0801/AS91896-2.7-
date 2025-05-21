@@ -8,9 +8,12 @@
     <title>Search Results - NZ Wildlife</title>
 </head>
 <body>
+    <!--Sign in and Register links-->
     <div class="container signin">
     <a href="login.html">Sign in</a> or <a href="register.html">Register</a>
     </div>
+
+    <!--Link back to home page-->
     <h1>Search Results</h1>
     <a href="/" class="back-link">← Back to Home</a>
 
@@ -26,6 +29,7 @@
                         <th>Image</th>
                     </tr>
                 </thead>
+                <!--Searches for data stored inside the database with the SQL query-->
                 <tbody>
                     {% for item in species %}
                     <tr class="species-row" data-name="{{ item[1] }}">
@@ -54,6 +58,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+        <!--If user searches for something that isn't stored in the database, the page will return "No results"-->
         {% else %}
             <p id="no-results">No results found for "{{ search_query }}"</p>
         {% endif %}

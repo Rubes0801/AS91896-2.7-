@@ -1,3 +1,7 @@
+# This application provides a web interface to query and display information
+# about New Zealand's wildlife species and their conservation status
+
+# Import necessary libraries
 from flask import Flask, g, render_template, request, redirect
 import sqlite3
 from flask_sqlalchemy import SQLAlchemy
@@ -7,6 +11,7 @@ db = SQLAlchemy()
 
 app = Flask(__name__)
 
+# Define database file path
 DATABASE = 'NZ_Wildlife.db'
 
 def get_db():
@@ -48,7 +53,7 @@ def home():
     
     cursor.close()
     
-    # Map column indices for different fields
+    # Define mapping of field names to column indices for template use
     field_indices = {
         'species_name': 1,
         'scientific_name': 2,
@@ -104,6 +109,7 @@ def species():
                OR LOWER(s.numbers) LIKE ?
         """, ['%' + search_query + '%'] * 18)  # 9 for CASE + 9 for WHERE
     else:
+        # If no search query, display all species
         cursor.execute("SELECT *, NULL as matched_field FROM species")
     
     results = cursor.fetchall()
