@@ -9,27 +9,29 @@
 <body>
 <div class = "center">
 <h1> Welcome </h1>
-<form method="post">
 
-<form action="app.py">
-<div class="txt_field">
-<input type="text" name="email" id="email" required maxlength="100">
-<span> </span>
-<label>Email Address</label>
-</div>
+<!--Makes the fields required before proceeding to the app.py page-->
+<form method="post" action="app.py">
+    <div class="txt_field">
+        <input type="text" name="email" id="email" required maxlength="100">
+        <span></span>
+        <label>Email Address</label>
+    </div>
 
-<div class="txt_field">
-<input type="password" name="psw" id="psw" required maxlength="50" minlength="8">
-<span> </span>
-<label>Password</label>
-</div>
+    <div class="txt_field">
+        <input type="password" name="psw" id="psw" required maxlength="50" minlength="8">
+        <span></span>
+        <label>Password</label>
+    </div>
 
-<a href="app.py" class="btn">
-    <button type="button" onclick="window.location.href='app.py'; return false;">Login</button>
-</a>
+<!--Login Button-->
+<button type="submit">Login</button>
 
-<div class="users_signup" >
+<div class="users_signup">
+        Don't have an account? <a href="register.html">Register</a>
+    </div>
 
-Don't have an account? <a href="register.html">Register</a>
-</div>
 </form>
+</div>
+</body>
+</html>

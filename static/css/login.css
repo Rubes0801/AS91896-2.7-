@@ -107,7 +107,7 @@ form .txt_field {
   color: var(--primary-color); /* Using primary color on hover */
 }
 
-button[type="button"] {
+button[type="submit"] {
   width: 100%;
   height: 50px;
   border: none; /* Removed border to match button styling */
@@ -121,7 +121,7 @@ button[type="button"] {
   transition: background-color 0.3s; /* Added transition to match styles.css */
 }
 
-button[type="button"]:hover {
+button[type="submit"]:hover {
   background-color: var(--secondary-color); /* Using secondary color on hover */
 }
 
