@@ -134,5 +134,52 @@ def add():
 
     return redirect('/')
 
+@app.route("/register")
+def register():
+    return render_template("register.html")
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
+    
+
+@app.route("/api/search-suggestions")
+def search_suggestions():
+    query = request.args.get('q', '').lower().strip()
+    if len(query) < 2:  # Only search if at least 2 characters
+        return {'suggestions': []}
+    
+    cursor = get_db().cursor()
+    
+    # Search for matching species names and scientific names
+    cursor.execute("""
+        SELECT DISTINCT species_name, scientific_name 
+        FROM species 
+        WHERE LOWER(species_name) LIKE ? 
+           OR LOWER(scientific_name) LIKE ?
+        ORDER BY species_name
+        LIMIT 10
+    """, ['%' + query + '%', '%' + query + '%'])
+    
+    results = cursor.fetchall()
+    cursor.close()
+    
+    suggestions = []
+    for row in results:
+        # Add species name if it matches
+        if query in row[0].lower():
+            suggestions.append({
+                'text': row[0],
+                'type': 'Species Name'
+            })
+        # Add scientific name if it matches and is different
+        if query in row[1].lower() and row[1] != row[0]:
+            suggestions.append({
+                'text': row[1],
+                'type': 'Scientific Name'
+            })
+    
+    return {'suggestions': suggestions[:8]}  # Limit to 8 suggestions
