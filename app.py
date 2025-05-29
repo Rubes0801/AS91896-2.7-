@@ -137,20 +137,16 @@ def add():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        # Handle registration logic here (you can add this later)
+        # Handle registration logic here 
         return redirect('/')  # Redirect to home after registration
     return render_template("register.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        # Handle login logic here (you can add this later)
+        # Handle login logic here 
         return redirect('/')  # Redirect to home after login
     return render_template("login.html")
-
-if __name__ == "__main__":
-    app.run(debug=True)
-    
 
 @app.route("/api/search-suggestions")
 def search_suggestions():
@@ -189,3 +185,7 @@ def search_suggestions():
             })
     
     return {'suggestions': suggestions[:8]}  # Limit to 8 suggestions
+
+if __name__ == "__main__":
+    app.run(debug=True)
+    
