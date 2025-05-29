@@ -134,12 +134,18 @@ def add():
 
     return redirect('/')
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        # Handle registration logic here (you can add this later)
+        return redirect('/')  # Redirect to home after registration
     return render_template("register.html")
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        # Handle login logic here (you can add this later)
+        return redirect('/')  # Redirect to home after login
     return render_template("login.html")
 
 if __name__ == "__main__":
