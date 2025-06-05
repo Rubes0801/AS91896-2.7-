@@ -17,7 +17,6 @@
     <h1>Search Results</h1>
     <a href="/" class="back-link">← Back to Home</a>
 
-    <!-- Replace the existing search form in your species.html template with this: -->
 <form method="GET" action="/species">
     <div class="search-container">
         <div class="search-wrapper">
@@ -25,7 +24,7 @@
                    name="name" 
                    class="search-input" 
                    id="searchInput"
-                   placeholder="Search for species name or scientific name..." 
+                   placeholder="Search..." 
                    value="{{ search_query or '' }}"
                    autocomplete="off">
             <div id="searchDropdown" class="search-dropdown"></div>
@@ -119,14 +118,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     }
 
-    // Show loading state
+// Show loading state
     function showLoading() {
-        setTimeout(function() {
-  // Code to be executed after 3 seconds
         searchDropdown.innerHTML = '<div class="dropdown-loading">Searching...</div>';
         searchDropdown.classList.add('show');
-  console.log("Waited 2 seconds");
-}, 500);
     }
 
     // Show suggestions in dropdown
