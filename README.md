@@ -1,5 +1,7 @@
 # AS91896-2.7-
-Programming Internal. My NZ Wildlife website will be a newer version, with better things.
+Programming Internal. My NZ Wildlife website will be a newer version, with better things such as a more user 
+friendly search process, include a new register page and a new login page. This gets the user more 
+involved in the website and more interested in what it has to offer.
 
 # Getting started
 ## Preliminaries
