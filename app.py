@@ -6,10 +6,13 @@ from flask import Flask, g, render_template, request, redirect
 import sqlite3
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from werkzeug.security import generate_password_hash, check_password_hash
+import re
 
 db = SQLAlchemy()
 
 app = Flask(__name__)
+app.secret_key = '************'  
 
 # Define database file path
 DATABASE = 'NZ_Wildlife.db'
@@ -137,17 +140,94 @@ def add():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        # Handle registration logic here 
-        return redirect('/')  # Redirect to home after registration
+        email = request.form.get('email')
+        password = request.form.get('psw')
+        password_repeat = request.form.get('psw-repeat')
+        
+        # Validation
+        if not email or not password or not password_repeat:
+            flash('All fields are required', 'error')
+            return render_template("register.html")
+        
+        # Email validation
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, email):
+            flash('Please enter a valid email address', 'error')
+            return render_template("register.html")
+        
+        # Password validation
+        if len(password) < 8:
+            flash('Password must be at least 8 characters long', 'error')
+            return render_template("register.html")
+        
+        if password != password_repeat:
+            flash('Passwords do not match', 'error')
+            return render_template("register.html")
+        
+        try:
+            cursor = get_db().cursor()
+            
+            # Check if user already exists
+            cursor.execute("SELECT usernames FROM Users WHERE usernames = ?", (email,))
+            if cursor.fetchone():
+                flash('Email already registered', 'error')
+                cursor.close()
+                return render_template("register.html")
+            
+            # Hash the password
+            hashed_password = generate_password_hash(password)
+            
+            # Insert new user
+            cursor.execute("INSERT INTO Users (usernames, passwords) VALUES (?, ?)", 
+                         (email, hashed_password))
+            get_db().commit()
+            cursor.close()
+            
+            flash('Registration successful! Please login.', 'success')
+            return redirect('/login')
+            
+        except sqlite3.Error as e:
+            flash('Registration failed. Please try again.', 'error')
+            return render_template("register.html")
+        
     return render_template("register.html")
+        # Handle registration logic here 
+  
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        # Handle login logic here 
-        return redirect('/')  # Redirect to home after login
+        email = request.form.get('email')
+        password = request.form.get('psw')
+        
+        # Validation
+        if not email or not password:
+            flash('Email and password are required', 'error')
+            return render_template("login.html")
+        
+        try:
+            cursor = get_db().cursor()
+            cursor.execute("SELECT usernames, passwords FROM Users WHERE usernames = ?", (email,))
+            user = cursor.fetchone()
+            cursor.close()
+            
+            if user and check_password_hash(user[1], password):
+                # Login successful
+                session['user_email'] = email
+                flash('Login successful!', 'success')
+                return redirect('/')
+            else:
+                flash('Invalid email or password', 'error')
+                return render_template("login.html")
+                
+        except sqlite3.Error as e:
+            flash('Login failed. Please try again.', 'error')
+            return render_template("login.html")
+    
     return render_template("login.html")
-
+    return redirect('/')  # Redirect to home after login
+    
+    
 @app.route("/api/search-suggestions")
 def search_suggestions():
     query = request.args.get('q', '').lower().strip()
