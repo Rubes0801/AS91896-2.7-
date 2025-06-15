@@ -2,7 +2,7 @@
 # about New Zealand's wildlife species and their conservation status
 
 # Import necessary libraries
-from flask import Flask, g, render_template, request, redirect
+from flask import Flask, g, render_template, request, redirect, flash, session
 import sqlite3
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -167,9 +167,16 @@ def register():
         try:
             cursor = get_db().cursor()
             
-            # Check if user already exists
-            cursor.execute("SELECT usernames FROM Users WHERE usernames = ?", (email,))
-            if cursor.fetchone():
+            # Check if user already exists (try different table name cases)
+            try:
+                cursor.execute("SELECT usernames FROM Users WHERE usernames = ?", (email,))
+                existing_user = cursor.fetchone()
+            except sqlite3.OperationalError:
+                # Try lowercase table name if uppercase doesn't exist
+                cursor.execute("SELECT usernames FROM users WHERE usernames = ?", (email,))
+                existing_user = cursor.fetchone()
+            
+            if existing_user:
                 flash('Email already registered', 'error')
                 cursor.close()
                 return render_template("register.html")
@@ -177,9 +184,15 @@ def register():
             # Hash the password
             hashed_password = generate_password_hash(password)
             
-            # Insert new user
-            cursor.execute("INSERT INTO Users (usernames, passwords) VALUES (?, ?)", 
-                         (email, hashed_password))
+            # Insert new user (try different table name cases)
+            try:
+                cursor.execute("INSERT INTO Users (usernames, passwords) VALUES (?, ?)", 
+                             (email, hashed_password))
+            except sqlite3.OperationalError:
+                # Try lowercase table name if uppercase doesn't exist
+                cursor.execute("INSERT INTO users (usernames, passwords) VALUES (?, ?)", 
+                             (email, hashed_password))
+            
             get_db().commit()
             cursor.close()
             
@@ -187,11 +200,10 @@ def register():
             return redirect('/login')
             
         except sqlite3.Error as e:
-            flash('Registration failed. Please try again.', 'error')
+            flash(f'Registration failed: {str(e)}', 'error')
             return render_template("register.html")
         
     return render_template("register.html")
-        # Handle registration logic here 
   
 
 @app.route("/login", methods=["GET", "POST"])
@@ -207,8 +219,16 @@ def login():
         
         try:
             cursor = get_db().cursor()
-            cursor.execute("SELECT usernames, passwords FROM Users WHERE usernames = ?", (email,))
-            user = cursor.fetchone()
+            
+            # Try to find user (try different table name cases)
+            try:
+                cursor.execute("SELECT usernames, passwords FROM Users WHERE usernames = ?", (email,))
+                user = cursor.fetchone()
+            except sqlite3.OperationalError:
+                # Try lowercase table name if uppercase doesn't exist
+                cursor.execute("SELECT usernames, passwords FROM users WHERE usernames = ?", (email,))
+                user = cursor.fetchone()
+            
             cursor.close()
             
             if user and check_password_hash(user[1], password):
@@ -221,11 +241,17 @@ def login():
                 return render_template("login.html")
                 
         except sqlite3.Error as e:
-            flash('Login failed. Please try again.', 'error')
+            flash(f'Login failed: {str(e)}', 'error')
             return render_template("login.html")
     
     return render_template("login.html")
-    return redirect('/')  # Redirect to home after login
+
+
+@app.route("/logout")
+def logout():
+    session.pop('user_email', None)
+    flash('You have been logged out', 'info')
+    return redirect('/login')
     
     
 @app.route("/api/search-suggestions")
@@ -265,6 +291,24 @@ def search_suggestions():
             })
     
     return {'suggestions': suggestions[:8]}  # Limit to 8 suggestions
+
+def init_db():
+    cursor = get_db().cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usernames TEXT UNIQUE NOT NULL,
+            passwords TEXT NOT NULL
+        )
+    ''')
+    get_db().commit()
+    cursor.close()
+
+# Add this line before if __name__ == "__main__":
+if __name__ == "__main__":
+    with app.app_context():
+        init_db()
+    app.run(debug=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
