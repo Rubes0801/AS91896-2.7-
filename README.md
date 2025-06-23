@@ -47,6 +47,8 @@ pip install -r requirements.txt
 ## Run the app
 ```
 python app.py
+
+pip install gunicorn
 ```
 
 ## Extra tasks           
